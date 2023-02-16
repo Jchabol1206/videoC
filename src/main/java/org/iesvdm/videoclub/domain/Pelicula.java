@@ -2,17 +2,12 @@ package org.iesvdm.videoclub.domain;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import org.hibernate.annotations.OnDelete;
-import org.springframework.format.annotation.DateTimeFormat;
+import lombok.*;
 
 import java.math.BigDecimal;
+import java.time.Duration;
+import java.time.Period;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -20,8 +15,10 @@ import java.util.Set;
 @Entity
 @Table(name="pelicula")
 @Data
+@EqualsAndHashCode(of = "id_pelicula")
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class Pelicula {
 
     @Id
@@ -32,22 +29,20 @@ public class Pelicula {
     private String descripcion;
     @Column(name = "anyo_lanzamiento")
     @JsonFormat(pattern = "yyyy",  shape = JsonFormat.Shape.STRING)
-    private Date anyoLanzamiento;
+    private String anyoLanzamiento;
 
-    @ManyToOne()
-    @JoinColumn(name = "id_idioma", nullable = false)
-    private Idioma idioma;
 
-    @ManyToOne()
-    @JoinColumn(name = "id_idioma_original")
-    private Idioma idiomaOriginal;
+    private String idioma;
+
+
+    private String idiomaOriginal;
 
     @Column(name = "duracion_alquiler")
-    private int duracionAlquiler;
+    private Period duracionAlquiler;
 
     @Column(name = "rental_rate")
     private BigDecimal rentalRate;
-    private int duracion;
+    private Duration duracion;
 
     @Column(name = "replacement_cost")
     private BigDecimal replacementCost;
@@ -56,7 +51,7 @@ public class Pelicula {
     @Column(name = "caracteristicas_especiales")
     private String caracteristicasEspeciales;
 
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
     @JoinTable(
             name = "pelicula_categoria",
             joinColumns = @JoinColumn(name = "id_pelicula", referencedColumnName = "id_pelicula"),
